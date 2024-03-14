@@ -1,0 +1,112 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class KeyValuePair {
+public:
+    string key;
+    string value;
+    KeyValuePair* next;
+
+    KeyValuePair(const string& key, const string& value) 
+    : key(key), value(value), next(nullptr) 
+    {
+        
+    }
+};
+
+class HashTable {
+private:
+    static const int tableSize = 11;
+    KeyValuePair* table[tableSize];
+
+    int hashFunc(const string& key) {
+        int hashVal = 0;
+        for (char ch : key) {
+            hashVal += ch;
+        }
+        return hashVal % tableSize;
+    }
+
+public:
+    HashTable() {
+        for (int i = 0; i < tableSize; ++i) {
+            table[i] = nullptr;
+        }
+    }
+
+    void insert(const string& key, const string& value) {
+        int hashKey = hashFunc(key);
+        KeyValuePair* newNode = new KeyValuePair(key, value);
+        if (table[hashKey] == nullptr) {
+            table[hashKey] = newNode;
+        } 
+        else {
+            KeyValuePair* temp = table[hashKey];
+            while (temp -> next != nullptr) {
+                temp = temp -> next;
+            }
+            temp -> next = newNode;
+        }
+    }
+
+    string lookup(const string& key) {
+        int hashKey = hashFunc(key);
+        KeyValuePair* temp = table[hashKey];
+        while (temp != nullptr) {
+            if (temp -> key == key) {
+                return temp -> value;
+            }
+            temp = temp -> next;
+        }
+        return "User not found";
+    }
+
+    void remove(const string& key) {
+        int hashKey = hashFunc(key);
+        KeyValuePair* current = table[hashKey];
+        KeyValuePair* prev = table[hashKey];
+        while (current != nullptr) {
+            if (current -> key == key) {
+                if (prev == nullptr) {
+                    table[hashKey] = current -> next;
+                } 
+                else {
+                    prev -> next = current -> next;
+                }
+                delete current;
+                return;
+            }
+            prev = current;
+            current = current -> next;
+        }
+    }
+
+    void printHashTable() {
+        for (int i = 0; i < tableSize; ++i) {
+            cout << "Bucket " << i << ": ";
+            KeyValuePair* temp = table[i];
+            while (temp != nullptr) {
+                cout << "{ " << temp -> key << " : " << temp -> value << " } ";
+                temp = temp -> next;
+            }
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    HashTable hash_table;
+    hash_table.insert("Sirithar", "220614H");
+    hash_table.insert("Sirithar", "220614H");
+    hash_table.printHashTable();
+
+    cout << endl;
+    hash_table.insert("Subaskaran", "220012F");
+    hash_table.insert("Prabakaran", "221567K");
+    hash_table.insert("Sujinthan", "221557K");
+    hash_table.printHashTable();
+
+    return 0;
+}
