@@ -1,0 +1,80 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class KeyValuePair {
+    public:
+        string key;
+        string value;
+};
+
+class HashTable {
+private:
+    static const int tableSize = 11;
+    vector<KeyValuePair> table[tableSize];
+
+    int hashFunc(const string& key) {
+        int hashVal = 0;
+        for (char ch : key) {
+            hashVal += ch;
+        }
+        return hashVal % tableSize;
+    }
+
+public:
+    void insert(const string& key, string value) {
+        int hash_key = hashFunc(key);
+        for (auto& data : table[hash_key]) {
+            if (data.key == key) {
+                data.value = value;
+                return;
+            }
+        }
+        table[hash_key].push_back({key, value});
+    }
+
+    string lookup(const string& key) {
+        int hash_key = hashFunc(key);
+        for (auto& data : table[hash_key]) {
+            if (data.key == key) {
+                return data.value;
+            }
+        }
+        return "NULL"; 
+    }
+
+    void remove(const string& key) {
+        int hash_key = hashFunc(key);
+        auto& bucket = table[hash_key];
+        for(auto buck = bucket.begin(); buck != bucket.end(); ++buck) {
+            if(buck->key == key) {
+                bucket.erase(buck);
+                return;
+            }
+        }
+    }
+    void printHashTable() {
+        for (int i = 0; i < tableSize; ++i) {
+            cout << "Bucket " << i << ": ";
+            for (const auto& pair : table[i]) {
+                cout << "{ " << pair.key << " : " << pair.value << " } ";
+            }
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    HashTable hash_table;
+    hash_table.insert("Sirithar", "220614H");
+    hash_table.insert("Subaskaran", "220012F");
+    hash_table.insert("Prabakaran", "221567K");
+    hash_table.printHashTable();
+    
+    cout << "" << endl;
+    hash_table.remove("Sirithar");
+    hash_table.printHashTable();
+    return 0;
+}
